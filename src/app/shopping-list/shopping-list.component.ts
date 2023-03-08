@@ -10,14 +10,14 @@ import { ShoppingListService } from './shopping-list.service';
 })
 export class ShoppingListComponent {
   ingredients: Ingredient[];
-  private igChangeSub = new Subscription();
+  private subscription = new Subscription();
 
   constructor(private shoppingListService: ShoppingListService) {}
 
   ngOnInit() {
     this.ingredients = this.shoppingListService.getIngredients();
     //after change of ingredients array (added new ingredient), return new array
-    this.igChangeSub = this.shoppingListService.ingredientsChanged.subscribe(
+    this.subscription = this.shoppingListService.ingredientsChanged.subscribe(
       (ingredients) => {
         this.ingredients = ingredients;
       }
@@ -25,6 +25,6 @@ export class ShoppingListComponent {
   }
 
   ngOnDestroy() {
-    this.igChangeSub.unsubscribe();
+    this.subscription.unsubscribe();
   }
 }
