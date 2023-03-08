@@ -16,7 +16,6 @@ export class RecipeEditComponent {
     this.route.params.subscribe((params: Params) => {
       this.id = Number(params['id']);
       this.editMode = params['id'] != null; //skip checking type
-      console.log(this.editMode);
     });
   }
 }
