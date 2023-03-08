@@ -1,11 +1,9 @@
-<app-header (currentPage)="currentPage($event)"></app-header>
+<app-header></app-header>
 <div class="container">
   <div class="row">
-    <div class="col-md-12" [ngSwitch]="pageSelector">
-      <app-recipes *ngSwitchCase="pageLegend.recipes"></app-recipes>
-      <app-shopping-list
-        *ngSwitchCase="pageLegend.shoppingList"
-      ></app-shopping-list>
+    <div class="col-md-12">
+      <router-outlet></router-outlet>
+      <!-- to make it work, import in app.module.ts ' AppRoutingModule' -->
     </div>
   </div>
 </div>
