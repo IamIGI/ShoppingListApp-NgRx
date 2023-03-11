@@ -24,6 +24,10 @@ export class ShoppingListComponent {
     );
   }
 
+  onEditItem(index: number) {
+    this.shoppingListService.startedEditing.next(index); // pass index to service, so you could listen (get the index) from other component
+  }
+
   ngOnDestroy() {
     this.subscription.unsubscribe();
   }
