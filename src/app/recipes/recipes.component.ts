@@ -1,12 +1,11 @@
 import { Component } from '@angular/core';
 
-import { RecipeService } from './recipe.service';
-
 @Component({
   selector: 'app-recipes',
   templateUrl: './recipes.component.html',
   styleUrls: ['./recipes.component.css'],
-  providers: [RecipeService],
+  providers: [],
+  // providers: [RecipeService], //service can be used just in recipe-components !!!
 })
 export class RecipesComponent {
   constructor() {}
