@@ -2,13 +2,15 @@ import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { environment } from 'src/environments/environment.development';
 import { catchError, throwError } from 'rxjs';
+import { errorMessageHandler } from './auth-errorMessages.services';
 
-interface AuthResponseData {
+export interface AuthResponseData {
   localId: string;
   email: string;
   idToken: string;
   refreshToken: string;
   expiresIn: string;
+  registered?: boolean;
 }
 
 @Injectable({
@@ -16,6 +18,7 @@ interface AuthResponseData {
 })
 export class AuthService {
   SIGNUP_URL = `https://identitytoolkit.googleapis.com/v1/accounts:signUp?key=${environment.webApiKey}`;
+  LOGIN_URL = `https://identitytoolkit.googleapis.com/v1/accounts:signInWithPassword?key=${environment.webApiKey}`;
 
   constructor(private http: HttpClient) {}
 
@@ -27,36 +30,17 @@ export class AuthService {
         returnSecureToken: true,
       })
       .pipe(
-        catchError((errorRes) => {
-          let errorMessage = new Error('An unknown error occurred!');
-          if (!errorRes || !errorRes.error.error) {
-            return throwError(() => errorMessage);
-          }
-
-          errorMessage = this.knownErrorMessageHandler(
-            errorRes.error.error.message
-          );
-          return throwError(() => errorMessage);
-        })
+        catchError((errorRes) => errorMessageHandler('register', errorRes))
       );
   }
 
-  knownErrorMessageHandler(errorCode: string): Error {
-    let errorMessage = new Error();
-    switch (errorCode) {
-      case 'EMAIL_EXISTS':
-        errorMessage = new Error(
-          'The email address is already in use by another account.'
-        );
-      case 'OPERATION_NOT_ALLOWED':
-        errorMessage = new Error(
-          'Password sign-in is disabled for this project.'
-        );
-      case 'TOO_MANY_ATTEMPTS_TRY_LATER':
-        errorMessage = new Error(
-          ' We have blocked all requests from this device due to unusual activity. Try again later.'
-        );
-    }
-    return errorMessage;
+  login(email: string, password: string) {
+    return this.http
+      .post<AuthResponseData>(this.LOGIN_URL, {
+        email,
+        password,
+        returnSecureToken: true,
+      })
+      .pipe(catchError((errorRes) => errorMessageHandler('login', errorRes)));
   }
 }
