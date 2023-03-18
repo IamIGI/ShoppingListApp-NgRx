@@ -33,22 +33,30 @@ export class AuthService {
             return throwError(() => errorMessage);
           }
 
-          switch (errorRes.error.error.message) {
-            case 'EMAIL_EXISTS':
-              errorMessage = new Error(
-                'The email address is already in use by another account.'
-              );
-            case 'OPERATION_NOT_ALLOWED':
-              errorMessage = new Error(
-                'Password sign-in is disabled for this project.'
-              );
-            case 'TOO_MANY_ATTEMPTS_TRY_LATER':
-              errorMessage = new Error(
-                ' We have blocked all requests from this device due to unusual activity. Try again later.'
-              );
-          }
+          errorMessage = this.knownErrorMessageHandler(
+            errorRes.error.error.message
+          );
           return throwError(() => errorMessage);
         })
       );
+  }
+
+  knownErrorMessageHandler(errorCode: string): Error {
+    let errorMessage = new Error();
+    switch (errorCode) {
+      case 'EMAIL_EXISTS':
+        errorMessage = new Error(
+          'The email address is already in use by another account.'
+        );
+      case 'OPERATION_NOT_ALLOWED':
+        errorMessage = new Error(
+          'Password sign-in is disabled for this project.'
+        );
+      case 'TOO_MANY_ATTEMPTS_TRY_LATER':
+        errorMessage = new Error(
+          ' We have blocked all requests from this device due to unusual activity. Try again later.'
+        );
+    }
+    return errorMessage;
   }
 }
