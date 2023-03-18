@@ -1,5 +1,6 @@
 import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
+import { environment } from 'src/environments/environment.development';
 
 interface AuthResponseData {
   localId: string;
@@ -13,8 +14,7 @@ interface AuthResponseData {
   providedIn: 'root',
 })
 export class AuthService {
-  WEB_API_KEY = 'AIzaSyBAMQCTEiY9aZNV7Aflf7IBAV5UMISGqY0';
-  SIGNUP_URL = `https://identitytoolkit.googleapis.com/v1/accounts:signUp?key=${this.WEB_API_KEY}`;
+  SIGNUP_URL = `https://identitytoolkit.googleapis.com/v1/accounts:signUp?key=${environment.webApiKey}`;
 
   constructor(private http: HttpClient) {}
 
