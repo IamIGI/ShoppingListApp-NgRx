@@ -23,7 +23,6 @@ export class DataStorageService {
   }
 
   fetchRecipes() {
-    //inform about what type we are fetching
     return this.http.get<Recipe[]>(this.URL).pipe(
       map((recipes) => {
         return recipes.map((recipe) => {
@@ -36,7 +35,7 @@ export class DataStorageService {
       }),
       tap((recipes) => {
         this.recipesService.setRecipes(recipes);
-      }) // allow to execute some logic
+      }) //tap - allow to execute some logic
     );
   }
 }

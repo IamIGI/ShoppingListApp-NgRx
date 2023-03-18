@@ -1,5 +1,6 @@
 import { Component } from '@angular/core';
 import { NgForm } from '@angular/forms';
+import { Router } from '@angular/router';
 import { Observable } from 'rxjs';
 import { AuthResponseData, AuthService } from './auth.service';
 
@@ -12,7 +13,7 @@ export class AuthComponent {
   isLoading = false;
   error: string | null = null;
 
-  constructor(private authService: AuthService) {}
+  constructor(private authService: AuthService, private router: Router) {}
 
   authObs: Observable<AuthResponseData>;
 
@@ -38,6 +39,7 @@ export class AuthComponent {
     this.authObs.subscribe({
       next: (response) => {
         console.log(response);
+        this.navigateOnSuccess();
         this.error = null;
         this.isLoading = false;
       },
@@ -48,5 +50,9 @@ export class AuthComponent {
     });
 
     form.reset();
+  }
+
+  navigateOnSuccess() {
+    this.router.navigate(['./recipes']);
   }
 }
