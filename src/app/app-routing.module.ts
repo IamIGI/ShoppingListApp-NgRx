@@ -13,17 +13,19 @@ const appRoutes: Routes = [
   {
     path: 'recipes',
     component: RecipesComponent,
-    resolve: [RecipesResolverService], //resolvers will work before given url will be loaded
+
     children: [
       { path: '', component: RecipeStartComponent },
       { path: 'new', component: RecipeEditComponent },
       {
         path: ':id', //routes with dynamic parameters have to be after static urls
         component: RecipeDetailComponent,
+        resolve: [RecipesResolverService], //resolvers will work before given url will be loaded
       },
       {
         path: ':id/edit',
         component: RecipeEditComponent,
+        resolve: [RecipesResolverService], //resolvers will work before given url will be loaded
         // resolve: [RecipesResolverService],
       },
     ],

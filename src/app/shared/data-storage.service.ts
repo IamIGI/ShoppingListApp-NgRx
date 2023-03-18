@@ -1,8 +1,9 @@
 import { Injectable } from '@angular/core';
-import { HttpClient } from '@angular/common/http';
+import { HttpClient, HttpParams } from '@angular/common/http';
 import { RecipeService } from '../recipes/recipe.service';
 import { Recipe } from '../recipes/recipe.model';
-import { map, tap } from 'rxjs';
+import { map, tap, take, exhaustMap } from 'rxjs';
+import { AuthService } from '../auth/auth.service';
 
 @Injectable({
   providedIn: 'root', //the same as adding in app.module.ts in providers
@@ -12,7 +13,8 @@ export class DataStorageService {
     'https://shoppinglistapp-39626-default-rtdb.europe-west1.firebasedatabase.app/recipes.json';
   constructor(
     private http: HttpClient,
-    private recipesService: RecipeService
+    private recipesService: RecipeService,
+    private authService: AuthService
   ) {}
 
   storeRecipes() {
@@ -23,7 +25,9 @@ export class DataStorageService {
   }
 
   fetchRecipes() {
-    //inform about what type we are fetching
+    // indent observable required exhaustMap
+    // take(1) - take just one latest value and unsubscribe
+
     return this.http.get<Recipe[]>(this.URL).pipe(
       map((recipes) => {
         return recipes.map((recipe) => {
@@ -35,8 +39,9 @@ export class DataStorageService {
         });
       }),
       tap((recipes) => {
+        console.log(recipes);
         this.recipesService.setRecipes(recipes);
-      }) // allow to execute some logic
+      }) //tap - allow to execute some logic
     );
   }
 }

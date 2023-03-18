@@ -1,8 +1,10 @@
 import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { environment } from 'src/environments/environment.development';
-import { catchError, throwError } from 'rxjs';
+import { catchError, Subject, BehaviorSubject, tap } from 'rxjs';
 import { errorMessageHandler } from './auth-errorMessages.services';
+import { User } from './user.model';
+import { Router } from '@angular/router';
 
 export interface AuthResponseData {
   localId: string;
@@ -20,7 +22,10 @@ export class AuthService {
   SIGNUP_URL = `https://identitytoolkit.googleapis.com/v1/accounts:signUp?key=${environment.webApiKey}`;
   LOGIN_URL = `https://identitytoolkit.googleapis.com/v1/accounts:signInWithPassword?key=${environment.webApiKey}`;
 
-  constructor(private http: HttpClient) {}
+  //   user = new Subject<User>();
+  user = new BehaviorSubject<User>(null); //BehaviorSubject allows to see the history of emitted data.
+
+  constructor(private http: HttpClient, private router: Router) {}
 
   signUp(email: string, password: string) {
     return this.http
@@ -30,7 +35,15 @@ export class AuthService {
         returnSecureToken: true,
       })
       .pipe(
-        catchError((errorRes) => errorMessageHandler('register', errorRes))
+        catchError((errorRes) => errorMessageHandler('register', errorRes)),
+        tap((resData) =>
+          this.handleAuthentication(
+            resData.email,
+            resData.localId,
+            resData.idToken,
+            resData.expiresIn
+          )
+        )
       );
   }
 
@@ -41,6 +54,35 @@ export class AuthService {
         password,
         returnSecureToken: true,
       })
-      .pipe(catchError((errorRes) => errorMessageHandler('login', errorRes)));
+      .pipe(
+        catchError((errorRes) => errorMessageHandler('login', errorRes)),
+        tap((resData) =>
+          this.handleAuthentication(
+            resData.email,
+            resData.localId,
+            resData.idToken,
+            resData.expiresIn
+          )
+        )
+      );
+  }
+
+  logout() {
+    this.user.next(null);
+    this.router.navigate(['/auth']);
+  }
+
+  private handleAuthentication(
+    email: string,
+    userId: string,
+    token: string,
+    expiresIn: string
+  ) {
+    const expirationDate = new Date(
+      new Date().getTime() + Number(expiresIn) * 1000
+    ); //convert it into normal date new Date()
+    const user = new User(email, userId, token, expirationDate);
+
+    this.user.next(user); // emit this as current user
   }
 }
