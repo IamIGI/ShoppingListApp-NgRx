@@ -15,7 +15,7 @@ export class AuthInterceptorService implements HttpInterceptor {
   // have to have request with auth param || protected routes
   intercept(req: HttpRequest<any>, next: HttpHandler) {
     return this.authService.user.pipe(
-      take(1), // take first latest observable state
+      take(1), // take first latest observable state and unsubscribe
       //exhaustMap - map to inner observables and wait for them to complete
       exhaustMap((user) => {
         if (!user) {
