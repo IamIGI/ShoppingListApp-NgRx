@@ -1,5 +1,6 @@
 import { Component, NgModule } from '@angular/core';
 import { Routes, RouterModule } from '@angular/router';
+import { AuthGuardService } from './auth/auth-guard.service';
 import { AuthComponent } from './auth/auth.component';
 import { RecipeDetailComponent } from './recipes/recipe-detail/recipe-detail.component';
 import { RecipeEditComponent } from './recipes/recipe-edit/recipe-edit.component';
@@ -13,6 +14,7 @@ const appRoutes: Routes = [
   {
     path: 'recipes',
     component: RecipesComponent,
+    canActivate: [AuthGuardService],
     resolve: [RecipesResolverService], //resolvers will work before given url will be loaded
     children: [
       { path: '', component: RecipeStartComponent },
