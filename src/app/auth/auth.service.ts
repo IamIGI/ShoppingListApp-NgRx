@@ -1,10 +1,11 @@
 import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { environment } from 'src/environments/environment.development';
-import { catchError, Subject, BehaviorSubject, tap } from 'rxjs';
+import { catchError, BehaviorSubject, tap } from 'rxjs';
 import { errorMessageHandler } from './auth-errorMessages.services';
 import { User } from './user.model';
 import { Router } from '@angular/router';
+import localStorageDictionaries from '../data/localStorage.dictionaries';
 
 export interface AuthResponseData {
   localId: string;
@@ -24,8 +25,38 @@ export class AuthService {
 
   //   user = new Subject<User>();
   user = new BehaviorSubject<User>(null); //BehaviorSubject allows to see the history of emitted data.
+  private tokeExpirationTimeout: any;
 
   constructor(private http: HttpClient, private router: Router) {}
+
+  autoLogin() {
+    const userData: {
+      email: string;
+      id: string;
+      _token: string;
+      _tokenExpirationDate: string;
+    } = JSON.parse(localStorage.getItem('userData'));
+
+    if (!userData) {
+      return;
+    }
+
+    const loadedUser = new User(
+      userData.email,
+      userData.id,
+      userData._token,
+      new Date(userData._tokenExpirationDate)
+    );
+
+    if (loadedUser.token) {
+      const expirationDuration = this.calculateTimeForTokenToExpire(
+        userData._tokenExpirationDate
+      );
+      this.autoLogout(expirationDuration);
+
+      this.user.next(loadedUser);
+    }
+  }
 
   signUp(email: string, password: string) {
     return this.http
@@ -67,11 +98,6 @@ export class AuthService {
       );
   }
 
-  logout() {
-    this.user.next(null);
-    this.router.navigate(['/auth']);
-  }
-
   private handleAuthentication(
     email: string,
     userId: string,
@@ -84,5 +110,43 @@ export class AuthService {
     const user = new User(email, userId, token, expirationDate);
 
     this.user.next(user); // emit this as current user
+    this.saveUserDataToLocalStorage(user);
+    this.autoLogout(Number(expiresIn) * 1000);
+  }
+
+  logout() {
+    this.user.next(null);
+    this.router.navigate(['/auth']);
+    this.removeUserDataFromLocalStorage();
+
+    if (this.tokeExpirationTimeout) {
+      clearTimeout(this.tokeExpirationTimeout);
+    }
+  }
+
+  /**
+   * Automatically logout user after time expired
+   *
+   * @param expirationDuration pass value in milliseconds
+   */
+  autoLogout(expirationDuration: number) {
+    this.tokeExpirationTimeout = setTimeout(() => {
+      this.logout();
+    }, expirationDuration);
+  }
+
+  saveUserDataToLocalStorage(user: User) {
+    localStorage.setItem(
+      localStorageDictionaries.userData,
+      JSON.stringify(user)
+    );
+  }
+
+  removeUserDataFromLocalStorage() {
+    localStorage.removeItem(localStorageDictionaries.userData);
+  }
+  /** return time in milliseconds */
+  calculateTimeForTokenToExpire(expirationDate: string) {
+    return new Date(expirationDate).getTime() - new Date().getTime();
   }
 }
