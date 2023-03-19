@@ -52,7 +52,7 @@ export class AuthService {
       const expirationDuration = this.calculateTimeForTokenToExpire(
         userData._tokenExpirationDate
       );
-      // this.autoLogout(expirationDuration);
+      this.autoLogout(expirationDuration);
 
       this.user.next(loadedUser);
     }
