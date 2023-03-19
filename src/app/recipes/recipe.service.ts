@@ -9,31 +9,13 @@ import { Recipe } from './recipe.model';
 export class RecipeService {
   recipesChange = new Subject<Recipe[]>();
 
-  // private recipes: Recipe[] = [
-  //   new Recipe(
-  //     'A test recipe1',
-  //     'this is simply a test1',
-  //     'https://ichef.bbci.co.uk/food/ic/food_16x9_832/recipes/british_shakshuka_26737_16x9.jpg',
-  //     [new Ingredient('Meat', 1), new Ingredient('French Fries', 100)]
-  //   ),
-  //   new Recipe(
-  //     'A test recipe2',
-  //     'this is simply a test2',
-  //     'https://ichef.bbci.co.uk/food/ic/food_16x9_832/recipes/british_shakshuka_26737_16x9.jpg',
-  //     [
-  //       new Ingredient('Buns', 2),
-  //       new Ingredient('Meat', 1),
-  //       new Ingredient('Salad', 3),
-  //       new Ingredient('Cheese', 2),
-  //     ]
-  //   ),
-  // ];
   private recipes: Recipe[] = [];
 
   constructor(private shoppingListService: ShoppingListService) {}
 
   setRecipes(recipes: Recipe[]) {
     this.recipes = recipes;
+
     this.refreshRecipesData();
   }
 
