@@ -6,6 +6,7 @@
       *ngIf="error"
       (close)="closeErrorBox()"
     ></app-alert> -->
+    <!-- Dynamic Components, method: ViewChild -->
     <div #alertBox></div>
     <div *ngIf="isLoading" style="text-align: center">
       <app-loading-spinner></app-loading-spinner>
