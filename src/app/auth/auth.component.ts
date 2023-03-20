@@ -52,6 +52,10 @@ export class AuthComponent {
     form.reset();
   }
 
+  closeErrorBox() {
+    this.error = null;
+  }
+
   navigateOnSuccess() {
     this.router.navigate(['./recipes']);
   }
