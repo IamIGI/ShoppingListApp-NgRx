@@ -3,6 +3,13 @@ import { Routes, RouterModule } from '@angular/router';
 
 const appRoutes: Routes = [
   { path: '', redirectTo: '/recipes', pathMatch: 'full' }, //only redirect when path is exactly the same
+  {
+    path: 'recipes',
+    loadChildren: () =>
+      import('./recipes/recipes.module').then(
+        (module) => module.RecipesModules
+      ),
+  },
 ];
 
 //transform class to angular module
