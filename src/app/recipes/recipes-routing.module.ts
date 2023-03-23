@@ -9,7 +9,7 @@ import { RecipesComponent } from './recipes.component';
 
 const routes: Routes = [
   {
-    path: '',
+    path: '', //when lazy loading is implemented, this path should be empty
     component: RecipesComponent,
     canActivate: [AuthGuardService],
     resolve: [RecipesResolverService], //resolvers will work before given url will be loaded

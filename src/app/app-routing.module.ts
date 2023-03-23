@@ -21,13 +21,14 @@ const appRoutes: Routes = [
     path: 'auth',
     loadChildren: () =>
       import('./auth/auth.module').then((module) => module.AuthModule),
-  },
+  }, //lazy loading example
 ];
 
 //transform class to angular module
 @NgModule({
   imports: [
     RouterModule.forRoot(appRoutes, { preloadingStrategy: PreloadAllModules }),
+    //Preloading loads other modules when user do not require from app to download another data
   ],
   exports: [RouterModule],
 })
