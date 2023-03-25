@@ -8,6 +8,7 @@ https://console.firebase.google.com/project/shoppinglistapp-39626/database
 ## Firebase deploy instruction:
 Udemy course: 
 https://www.udemy.com/course/the-complete-guide-to-angular-2/learn/lecture/14466530#questions
+
 Firebase documentation:
 https://firebase.google.com/docs/cli#windows-npm
 
