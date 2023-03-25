@@ -2,8 +2,14 @@
 
 This project was generated with [Angular CLI](https://github.com/angular/angular-cli) version 15.2.0.
 
-## FireBase backend
+## Firebase backend
 https://console.firebase.google.com/project/shoppinglistapp-39626/database
+
+## Firebase deploy instruction:
+Udemy course: 
+https://www.udemy.com/course/the-complete-guide-to-angular-2/learn/lecture/14466530#questions
+Firebase documentation:
+https://firebase.google.com/docs/cli#windows-npm
 
 ## Development server
 
