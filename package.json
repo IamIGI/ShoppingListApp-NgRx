@@ -1,5 +1,5 @@
 {
-  "name": "shoppin-list-app",
+  "name": "shoppingListApp-NgRx",
   "version": "0.0.0",
   "scripts": {
     "ng": "ng",
