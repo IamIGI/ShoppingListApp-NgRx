@@ -6,6 +6,10 @@ import { errorMessageHandler } from './auth-errorMessages.services';
 import { User } from './user.model';
 import { Router } from '@angular/router';
 import localStorageDictionaries from '../data/localStorage.dictionaries';
+//Reducer imports
+import { Store } from '@ngrx/store';
+import * as fromApp from '../store/app.reducer';
+import * as AuthActions from './store/auth.actions';
 
 export interface AuthResponseData {
   localId: string;
@@ -24,10 +28,14 @@ export class AuthService {
   LOGIN_URL = `https://identitytoolkit.googleapis.com/v1/accounts:signInWithPassword?key=${environment.webApiKey}`;
 
   //   user = new Subject<User>();
-  user = new BehaviorSubject<User>(null); //BehaviorSubject allows to see the history of emitted data.
+  // user = new BehaviorSubject<User>(null); //BehaviorSubject allows to see the history of emitted data.
   private tokeExpirationTimeout: any;
 
-  constructor(private http: HttpClient, private router: Router) {}
+  constructor(
+    private http: HttpClient,
+    private router: Router,
+    private store: Store<fromApp.AppState>
+  ) {}
 
   autoLogin() {
     const userData: {
@@ -49,12 +57,18 @@ export class AuthService {
     );
 
     if (loadedUser.token) {
+      this.store.dispatch(
+        new AuthActions.Login({
+          email: loadedUser.email,
+          userId: loadedUser.id,
+          token: loadedUser.token,
+          expirationDate: new Date(userData._tokenExpirationDate),
+        })
+      );
       const expirationDuration = this.calculateTimeForTokenToExpire(
         userData._tokenExpirationDate
       );
       this.autoLogout(expirationDuration);
-
-      this.user.next(loadedUser);
     }
   }
 
@@ -109,13 +123,15 @@ export class AuthService {
     ); //convert it into normal date new Date()
     const user = new User(email, userId, token, expirationDate);
 
-    this.user.next(user); // emit this as current user
+    this.store.dispatch(
+      new AuthActions.Login({ email, userId, token, expirationDate })
+    );
     this.saveUserDataToLocalStorage(user);
     this.autoLogout(Number(expiresIn) * 1000);
   }
 
   logout() {
-    this.user.next(null);
+    this.store.dispatch(new AuthActions.Logout());
     this.router.navigate(['/auth']);
     this.removeUserDataFromLocalStorage();
 
