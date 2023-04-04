@@ -1,7 +1,7 @@
 import {
   Component,
-  ComponentFactoryResolver,
   OnDestroy,
+  OnInit,
   ViewChild,
   ViewContainerRef,
 } from '@angular/core';
@@ -10,12 +10,15 @@ import { Router } from '@angular/router';
 import { Observable, Subscription } from 'rxjs';
 import { AuthResponseData, AuthService } from './auth.service';
 import { AlertComponent } from '../shared/alert/alert.component';
-
+//@redux imports
+import { Store } from '@ngrx/store';
+import * as fromApp from '../store/app.reducer';
+import * as AuthActions from '../auth/store/auth.actions';
 @Component({
   selector: 'app-auth',
   templateUrl: './auth.component.html',
 })
-export class AuthComponent implements OnDestroy {
+export class AuthComponent implements OnInit, OnDestroy {
   isLoginMode = true;
   isLoading = false;
   error: string | null = null;
@@ -24,7 +27,22 @@ export class AuthComponent implements OnDestroy {
   @ViewChild('alertBox', { read: ViewContainerRef })
   alertBox: ViewContainerRef;
 
-  constructor(private authService: AuthService, private router: Router) {}
+  constructor(
+    private authService: AuthService,
+    private router: Router,
+    private store: Store<fromApp.AppState>
+  ) {}
+
+  ngOnInit() {
+    this.store.select('auth').subscribe((authState) => {
+      this.isLoading = authState.loading;
+      this.error = authState.authError;
+
+      if (this.error) {
+        this.showAlertBox(this.error);
+      }
+    });
+  }
 
   authObs: Observable<AuthResponseData>;
 
@@ -42,24 +60,24 @@ export class AuthComponent implements OnDestroy {
     this.isLoading = true;
 
     if (this.isLoginMode) {
-      this.authObs = this.authService.login(email, password);
+      this.store.dispatch(new AuthActions.LoginStart({ email, password }));
     } else {
       this.authObs = this.authService.signUp(email, password);
     }
 
-    this.authObs.subscribe({
-      next: (response) => {
-        console.log(response);
-        this.navigateOnSuccess();
-        this.error = null;
-        this.isLoading = false;
-      },
-      error: (errorMessage) => {
-        this.error = errorMessage;
-        this.showAlertBox(errorMessage);
-        this.isLoading = false;
-      },
-    });
+    // this.authObs.subscribe({
+    //   next: (response) => {
+    //     console.log(response);
+    //     this.navigateOnSuccess();
+    //     this.error = null;
+    //     this.isLoading = false;
+    //   },
+    //   error: (errorMessage) => {
+    //     this.error = errorMessage;
+    //     this.showAlertBox(errorMessage);
+    //     this.isLoading = false;
+    //   },
+    // });
 
     form.reset();
   }
@@ -79,9 +97,9 @@ export class AuthComponent implements OnDestroy {
     this.error = null;
   }
 
-  navigateOnSuccess() {
-    this.router.navigate(['./recipes']);
-  }
+  // navigateOnSuccess() {
+  //   this.router.navigate(['./recipes']);
+  // }
 
   ngOnDestroy() {
     this.alertSub.unsubscribe();
