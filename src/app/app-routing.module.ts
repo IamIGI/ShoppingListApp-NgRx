@@ -27,7 +27,10 @@ const appRoutes: Routes = [
 //transform class to angular module
 @NgModule({
   imports: [
-    RouterModule.forRoot(appRoutes, { preloadingStrategy: PreloadAllModules }),
+    RouterModule.forRoot(appRoutes, {
+      preloadingStrategy: PreloadAllModules,
+      initialNavigation: 'enabledNonBlocking',
+    }),
     //Preloading loads other modules when user do not require from app to download another data
   ],
   exports: [RouterModule],
