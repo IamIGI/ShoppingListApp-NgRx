@@ -3,6 +3,10 @@ import { HttpClient } from '@angular/common/http';
 import { RecipeService } from '../recipes/recipe.service';
 import { Recipe } from '../recipes/recipe.model';
 import { map, tap } from 'rxjs';
+import { Store } from '@ngrx/store';
+//Redux imports
+import * as fromApp from '../store/app.reducer';
+import * as RecipesActions from '../recipes/store/recipe.actions';
 
 @Injectable({
   providedIn: 'root', //the same as adding in app.module.ts in providers
@@ -12,7 +16,8 @@ export class DataStorageService {
     'https://shoppinglistapp-39626-default-rtdb.europe-west1.firebasedatabase.app/recipes.json';
   constructor(
     private http: HttpClient,
-    private recipesService: RecipeService
+    private recipesService: RecipeService,
+    private store: Store<fromApp.AppState>
   ) {}
 
   storeRecipes() {
@@ -34,7 +39,8 @@ export class DataStorageService {
         });
       }),
       tap((recipes) => {
-        this.recipesService.setRecipes(recipes);
+        // this.recipesService.setRecipes(recipes);
+        this.store.dispatch(new RecipesActions.SetRecipes(recipes));
       }) //tap - allow to execute some logic
     );
   }
