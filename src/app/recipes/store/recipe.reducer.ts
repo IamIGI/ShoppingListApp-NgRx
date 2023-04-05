@@ -20,6 +20,36 @@ export function recipeReducer(
         recipes: [...action.payload],
       };
 
+    case RecipesActions.ADD_RECIPE:
+      const object = {
+        ...state,
+        recipes: [...state.recipes, action.payload],
+      };
+      console.log(object);
+      return object;
+
+    case RecipesActions.UPDATE_RECIPE:
+      const updatedRecipe = {
+        ...state.recipes[action.payload.index],
+        ...action.payload.newRecipe,
+      };
+
+      const updatedRecipes = [...state.recipes];
+      updatedRecipes[action.payload.index] = updatedRecipe;
+
+      return {
+        ...state,
+        recipes: updatedRecipes,
+      };
+
+    case RecipesActions.DELETE_RECIPE:
+      return {
+        ...state,
+        recipes: state.recipes.filter((recipe, index) => {
+          return index !== action.payload;
+        }),
+      };
+
     default:
       return state;
   }
